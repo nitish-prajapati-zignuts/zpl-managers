@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getPlayers } from "../api/action"
+import { getLogs, getPlayers } from "../api/action"
 
 export const useTeamPlayers = () => {
     return useQuery({
@@ -7,3 +7,9 @@ export const useTeamPlayers = () => {
         queryFn: () => getPlayers(),
     })
 }
+
+export const useLogs = () => useQuery({
+    queryKey: ["logs"],
+    queryFn: getLogs,
+    refetchInterval: 2000,
+});

@@ -2,8 +2,8 @@ export type Player = {
     _id: string;
     name: string;
     gender: "male" | "female";
-    grade: string; // e.g. "D"
-    role: "batsmen" | string; // extend if more roles exist
+    grade: string;
+    role: "batsmen" | string;
     basePrice: number;
     status: "sold" | "unsold" | "pending" | "on_block";
     soldTo: string | null;
@@ -12,8 +12,103 @@ export type Player = {
     isAuctionable: boolean;
     photoUrl: string | null;
     __v: number;
-    createdAt: string; // ISO date
-    updatedAt: string; // ISO date
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type BattingStats = {
+    innings: number;
+    total_runs: number;
+    highest_run: number;
+    average: string | number;
+    not_out: number;
+    strike_rate: number;
+    ball_faced: number;
+    batting_hand: string;
+    "4s": number;
+    "6s": number;
+    "50s": number;
+    "100s": number;
+    boundary_runs: number;
+    boundary_percentage: number;
+    runs_per_match: number;
+    is_centurion: boolean;
+    is_half_centurion: boolean;
+    is_aggressive: boolean;
+    is_consistent: boolean;
+    is_anchor: boolean;
+};
+
+export type BowlingStats = {
+    innings: number;
+    total_wickets: number;
+    balls: number;
+    highest_wicket: number;
+    economy: number;
+    maidens: number;
+    avg: number;
+    runs: number;
+    bowling_style: string;
+    overs: number;
+    dot_balls: number;
+    strike_rate: number;
+    dot_ball_percentage: number;
+    wickets_per_match: number;
+    is_five_wicket_haul: boolean;
+    is_economical: boolean;
+    is_wicket_taker: boolean;
+    is_spinner: boolean;
+};
+
+export type FieldingStats = {
+    catches: number;
+    caught_behind: number;
+    run_outs: number;
+    assist_run_outs: number;
+    stumpings: number;
+    caught_and_bowl: number;
+    total_catches: number;
+    total_dismissal: number;
+    dismissals_per_match: number;
+    is_keeper: boolean;
+    is_safe_hands: boolean;
+    is_sharp_fielder: boolean;
+};
+
+export type StatsDetails = {
+    _id: string;
+    playerRef: string;
+    season: string;
+    batting: BattingStats;
+    bowling: BowlingStats;
+    fielding: FieldingStats;
+    is_mvp: boolean;
+    total_match: number;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+};
+
+export type Log = {
+    _id: string;
+    auctionSessionId: string;
+    playerDetails: Player;
+    statsDetails?: StatsDetails;
+    action: string;
+    teamName: string | null;
+    amount: number | null;
+    basePrice: number;
+    performedBy: string;
+    message: string;
+    createdAt: string;
+    updatedAt: string;
+    __v?: number;
+};
+
+export type LogResponse = {
+    success: boolean;
+    count: number;
+    data: Log[];
 };
 
 export type PlayersResponse = {

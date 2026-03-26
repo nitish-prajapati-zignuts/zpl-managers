@@ -29,13 +29,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useTeamPlayers } from "@/app/services/query"
+import Image from "next/image"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
 
   const players = data?.data || []
 
-  const pendingPlayers = players.filter(p => !p.status || p.status?.toLowerCase() === "pending")
+  const pendingPlayers = players.filter(p => !p.status || p.status?.toLowerCase() !== "sold")
   const unsoldPlayers = players.filter(p => p.status?.toLowerCase() === "unsold")
   const soldPlayers = players.filter(p => p.status?.toLowerCase() === "sold")
 
@@ -156,10 +157,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props} className="border-r shadow-sm">
       <SidebarHeader className="border-b px-6 py-5 flex flex-row items-center gap-3 bg-white">
-        <div className="bg-primary p-1.5 rounded-lg">
-          <AudioWaveform className="h-5 w-5 text-primary-foreground" />
+        <div className="flex items-center gap-3">
+          <Image
+            src="/assets/logo.png"
+            alt="ZPL Logo"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
         </div>
-        <span className="font-black tracking-tighter text-xl text-primary">AUCTION PRO</span>
+        <span className="font-black tracking-tighter text-xl text-primary">ZPL AUCTION</span>
       </SidebarHeader>
 
       <SidebarContent className="p-2 space-y-1">
