@@ -175,9 +175,9 @@ const LIGHT_COLORS = [
 
 function Section({ title, children }: any) {
     return (
-        <div className="space-y-2">
+        <div className="space-y-4">
             <p className="text-[10px] font-black uppercase text-slate-400">{title}</p>
-            <div className="grid grid-cols-3 gap-3">{children}</div>
+            <div className="grid grid-cols-4 gap-2">{children}</div>
         </div>
     )
 }
