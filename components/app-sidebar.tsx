@@ -9,7 +9,8 @@ import {
   Gavel,
   UserX,
   Clock,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from "lucide-react"
 import {
   Sidebar,
@@ -26,18 +27,34 @@ import {
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
+  CollapsibleTrigger
 } from "@/components/ui/collapsible"
-import { useTeamPlayers } from "@/app/services/query"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useTeamPlayers, useTeamPlayerById } from "@/app/services/query"
+import { Button } from "./ui/button"
+import { PlayerDialog } from "./player-dialog"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
+  const [open, setOpen] = React.useState(false)
+  const [selectedPlayer, setSelectedPlayer] = React.useState<any>(null)
 
   const players = data?.data || []
 
   const pendingPlayers = players.filter(p => !p.status || p.status?.toLowerCase() === "pending")
   const unsoldPlayers = players.filter(p => p.status?.toLowerCase() === "unsold")
   const soldPlayers = players.filter(p => p.status?.toLowerCase() === "sold")
+
+  const handleOpenDialog = (player: any) => {
+    setSelectedPlayer(player)
+    setOpen(true)
+  }
 
   const renderContent = () => {
     if (isLoading) {
@@ -75,12 +92,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {pendingPlayers.map((player) => (
-                    <SidebarMenuItem key={player._id}>
-                      <SidebarMenuButton>
+                    <SidebarMenuItem className="flex flex-row items-center pr-2" key={player._id}>
+                      <SidebarMenuButton className="flex-1">
                         <User className="h-4 w-4 opacity-70" />
                         <span className="truncate">{player.name}</span>
                         <span className="ml-auto text-[10px] opacity-50 font-mono text-xs">₹{player.basePrice}</span>
                       </SidebarMenuButton>
+                      <ArrowRight
+                        className="h-4 w-4 opacity-40 hover:opacity-100 cursor-pointer transition-opacity"
+                        onClick={() => handleOpenDialog(player)}
+                      />
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -105,9 +126,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                   {soldPlayers.map((player) => (
                     <SidebarMenuItem key={player._id}>
-                      <SidebarMenuButton>
+                      <SidebarMenuButton onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4 text-blue-500" />
-                        <div className="flex flex-col overflow-hidden">
+                        <div className="flex flex-col overflow-hidden text-left">
                           <span className="truncate font-medium leading-none">{player.name}</span>
                           <span className="text-[10px] text-blue-600 font-bold">{player.soldTo}</span>
                         </div>
@@ -137,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                   {unsoldPlayers.map((player) => (
                     <SidebarMenuItem key={player._id}>
-                      <SidebarMenuButton className="opacity-60">
+                      <SidebarMenuButton className="opacity-60" onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4" />
                         <span className="truncate">{player.name}</span>
                         <span className="ml-auto text-[10px]">Base: ₹{player.basePrice}</span>
@@ -154,17 +175,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar {...props} className="border-r shadow-sm">
-      <SidebarHeader className="border-b px-6 py-5 flex flex-row items-center gap-3 bg-white">
-        <div className="bg-primary p-1.5 rounded-lg">
-          <AudioWaveform className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="font-black tracking-tighter text-xl text-primary">AUCTION PRO</span>
-      </SidebarHeader>
+    <>
+      <Sidebar {...props} className="border-r shadow-sm">
+        <SidebarHeader className="border-b px-6 py-5 flex flex-row items-center gap-3 bg-white">
+          <div className="bg-primary p-1.5 rounded-lg">
+            <AudioWaveform className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="font-black tracking-tighter text-xl text-primary">AUCTION PRO</span>
+        </SidebarHeader>
 
-      <SidebarContent className="p-2 space-y-1">
-        {renderContent()}
-      </SidebarContent>
-    </Sidebar>
+        <SidebarContent className="p-2 space-y-1">
+          {renderContent()}
+        </SidebarContent>
+      </Sidebar>
+
+      <PlayerDialog
+        open={open}
+        onOpenChange={setOpen}
+        player={selectedPlayer}
+      />
+    </>
   )
 }
