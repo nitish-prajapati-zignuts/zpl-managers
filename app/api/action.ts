@@ -32,3 +32,24 @@ export const getLogs = async (): Promise<Log[]> => {
         throw new Error("Failed to get Logs")
     }
 }
+export const getSinglePlayerStats = async (id: string) => {
+    try {
+        const response = await api.get(`/players/${id}/stats`);
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching players:", error);
+        throw new Error("Failed to get Players")
+    }
+}
+
+export const getTeams = async () => {
+    try {
+        const response = await api.get("/teams");
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching teams:", error);
+        throw new Error("Failed to get Teams")
+    }
+}
