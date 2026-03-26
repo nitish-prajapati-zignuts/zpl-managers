@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   description: "ZPL Manager",
 };
 
+import { QueryProvider } from "@/components/query-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,9 +34,11 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", figtree.variable)}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>
-          {children}
-        </TooltipProvider>
+        <QueryProvider>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </QueryProvider>
       </body>
     </html>
   );
