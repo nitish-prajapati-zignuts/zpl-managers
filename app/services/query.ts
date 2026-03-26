@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { getLogs, getPlayers } from "../api/action"
 import { getPlayers, getSinglePlayerStats, getTeams } from "../api/action"
 import { TeamsResponse } from "../types/types"
 
@@ -26,3 +27,9 @@ export const useTeams = () => {
         refetchIntervalInBackground:true
     })
 }
+
+export const useLogs = () => useQuery({
+    queryKey: ["logs"],
+    queryFn: getLogs,
+    refetchInterval: 2000,
+});
