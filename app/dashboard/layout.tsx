@@ -77,11 +77,6 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/view-my-team">
-              <Button variant="outline" size="sm" className="font-bold uppercase tracking-tight text-[11px] h-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-50">
-                View My Team
-              </Button>
-            </Link>
             <Link href="/view-all-teams">
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-tight text-[11px] h-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-50">
                 View All Teams
