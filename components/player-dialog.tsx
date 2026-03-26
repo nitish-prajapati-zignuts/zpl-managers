@@ -114,19 +114,26 @@ export function PlayerDialog({ open, onOpenChange, player }: Props) {
                             <Section title="Batting">
                                 <StatBox label="Runs" value={stats?.batting?.total_runs || 0} />
                                 <StatBox label="Avg" value={stats?.batting?.average || 0} />
-                                <StatBox label="SR" value={stats?.batting?.strike_rate || 0} />
+                                <StatBox label="Strike Rate" value={stats?.batting?.strike_rate || 0} />
+                                <StatBox label="50/100" value={`${stats?.batting?.["50s"] || 0}/${stats?.batting?.["100s"] || 0}`} />
+                                <StatBox label="4s/6s" value={`${stats?.batting?.["4s"] || 0}/${stats?.batting?.["6s"] || 0}`} />
+                                <StatBox label="Highest Run" value={stats?.batting?.highest_run || 0} />
+                                <StatBox label="Boundary Percentage" value={stats.batting.boundary_percentage > 0 ? stats?.batting.boundary_percentage + "%" : "N/A"} />
                             </Section>
 
                             <Section title="Bowling">
                                 <StatBox label="Wickets" value={stats?.bowling?.total_wickets || 0} />
                                 <StatBox label="Eco" value={stats?.bowling?.economy || 0} />
-                                <StatBox label="SR" value={stats?.bowling?.strike_rate || 0} />
+                                <StatBox label="Strike Rate" value={stats?.bowling?.strike_rate || 0} />
+                                <StatBox label="Dot Percentage" value={stats?.bowling?.dot_ball_percentage > 0 ? stats?.bowling.dot_ball_percentage + "%" : "N/A"} />
+                                <StatBox label="Average" value={stats?.bowling?.avg || 0} />
                             </Section>
 
                             <Section title="Fielding">
                                 <StatBox label="Catches" value={stats?.fielding?.catches || 0} />
                                 <StatBox label="Run Outs" value={stats?.fielding?.run_outs || 0} />
                                 <StatBox label="Dismissals" value={stats?.fielding?.total_dismissal || 0} />
+                                <StatBox label="Stumping Dismissal" value={stats?.fielding?.stumpings || 0} />
                             </Section>
                         </>
                     ) : (
@@ -154,6 +161,18 @@ export function PlayerDialog({ open, onOpenChange, player }: Props) {
 }
 /* ---------- Reusable Components ---------- */
 
+const LIGHT_COLORS = [
+    "bg-red-50",
+    "bg-blue-50",
+    "bg-green-50",
+    "bg-yellow-50",
+    "bg-purple-50",
+    "bg-pink-50",
+    "bg-indigo-50",
+    "bg-teal-50",
+    "bg-orange-50",
+];
+
 function Section({ title, children }: any) {
     return (
         <div className="space-y-2">
@@ -163,13 +182,55 @@ function Section({ title, children }: any) {
     )
 }
 
+function getRandomColor() {
+    return LIGHT_COLORS[Math.floor(Math.random() * LIGHT_COLORS.length)];
+}
+
+const GRADIENTS = [
+    "from-red-50 to-red-100",
+    "from-blue-50 to-blue-100",
+    "from-green-50 to-green-100",
+    "from-yellow-50 to-yellow-100",
+    "from-purple-50 to-purple-100",
+    "from-pink-50 to-pink-100",
+    "from-indigo-50 to-indigo-100",
+    "from-teal-50 to-teal-100",
+    "from-orange-50 to-orange-100",
+];
+
+function getGradient(label: string) {
+    const index = label.charCodeAt(0) % GRADIENTS.length;
+    return GRADIENTS[index];
+}
+
 function StatBox({ label, value, className = "" }: any) {
+    const gradient = getGradient(label);
+
     return (
-        <div className="p-3 rounded-xl bg-slate-50 border">
-            <span className="block text-[10px] font-black uppercase text-slate-400 mb-1">
+        <div
+            className={`
+                group relative overflow-hidden
+                p-4 rounded-2xl border
+                bg-gradient-to-br ${gradient}
+                shadow-sm hover:shadow-md
+                transition-all duration-300
+                hover:-translate-y-1
+            `}
+        >
+            {/* Glow Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 bg-white/30 blur-xl" />
+
+            {/* Content */}
+            <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                 {label}
             </span>
-            <p className={`text-sm font-black ${className}`}>{value}</p>
+
+            <p className={`text-lg font-extrabold text-slate-800 ${className}`}>
+                {value}
+            </p>
+
+            {/* Accent Line */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 bg-slate-700 group-hover:w-full transition-all duration-300 rounded-full" />
         </div>
-    )
+    );
 }
