@@ -491,8 +491,7 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, UserCircle, DollarSign, Clock, Award } from "lucide-react"
+import { Users, Award, Clock } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -500,7 +499,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { useTeamPlayerById, useTeams } from "@/app/services/query"
+import { useTeams } from "@/app/services/query"
+import { formatAmount, isLightColor } from "@/lib/utils"
+import { TEAM_CONFIG } from "@/lib/config"
 
 // Custom SVG Icons for Cricket Roles
 const BatIcon = () => (
@@ -535,7 +536,6 @@ const KeepIcon = () => (
     </svg>
 )
 
-// Map player role string from API to display icon
 const getRoleIcon = (role: string) => {
     switch (role?.toLowerCase()) {
         case "batsmen":
@@ -552,42 +552,10 @@ const getRoleIcon = (role: string) => {
         case "keeper":
             return <KeepIcon />
         default:
-            return <UserCircle className="h-3 w-3 text-slate-400" />
+            return <Users className="h-3 w-3 text-slate-400" />
     }
 }
 
-// Format rupees: if >= 10,00,000 show in Cr, else in L
-const formatAmount = (amount: number): string => {
-    if (amount >= 10000000) return `${(amount / 10000000).toFixed(2)} Cr`
-    if (amount >= 100000) return `${(amount / 100000).toFixed(1)} L`
-    return `${(amount / 1000).toFixed(0)}K`
-}
-
-// Check if a color is light or dark for text contrast
-const isLightColor = (color: string) => {
-    const hex = color.replace('#', '');
-    if (hex.length !== 6) return false;
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 155;
-};
-
-const TEAM_CONFIG: any = {
-    "THE MAVERICKS": { color: "#372267", logo: "/assets/teams/theMavericks.png", bg: "#3722671A", badgeColor: "#372267" },
-    "THE MAVERICS": { color: "#372267", logo: "/assets/teams/theMavericks.png", bg: "#3722671A", badgeColor: "#372267" },
-    "MARVEL MONSTER": { color: "#0F245C", logo: "/assets/teams/marvelMonster.png", bg: "#0F245C1A", badgeColor: "#0F245C" },
-    "MARVEL MONSTERS": { color: "#0F245C", logo: "/assets/teams/marvelMonster.png", bg: "#0F245C1A", badgeColor: "#0F245C" },
-    "GRAY MIGHTY": { color: "#9899AE", logo: "/assets/teams/grayMighty.png", bg: "#9899AE1A", badgeColor: "#9899AE" },
-    "TROJAN HORSE": { color: "#D9ADE3", logo: "/assets/teams/trojanHorsh.png", bg: "#D9ADE31A", badgeColor: "#D9ADE3" },
-    "STAR STRIKERS": { color: "#C63674", logo: "/assets/teams/starStriker.png", bg: "#C636741A", badgeColor: "#C63674" },
-    "RED SQUAD": { color: "#640105", logo: "/assets/teams/redSquad.png", bg: "#6401051A", badgeColor: "#640105" },
-    "THE TECH TITANS": { color: "#000000", logo: "/assets/teams/techTitans.png", bg: "#0000001A", badgeColor: "#000000" },
-    "SUPER SMASHERS": { color: "#FFD451", logo: "/assets/teams/superSmash.png", bg: "#FFD4511A", badgeColor: "#000000" },
-};
-
-// Find playerStats for a given player _id within a team
 const findStatsForPlayer = (playerStats: any[], playerId: string) => {
     return playerStats?.find((s: any) => s.playerRef === playerId) ?? null
 }
@@ -598,8 +566,6 @@ export default function ViewAllTeams() {
     const [open, setOpen] = React.useState(false)
 
     const { data: teamsResponse, isLoading: isTeamsLoading } = useTeams()
-
-    // teamsResponse is expected to be the API JSON: { success, count, data: [...] }
     const teams: any[] = teamsResponse?.data ?? []
 
     const handlePlayerClick = (player: any, stats: any) => {
@@ -635,12 +601,10 @@ export default function ViewAllTeams() {
                                 className="flex flex-col rounded-xl shadow-2xl overflow-hidden transition-all duration-300 group min-h-[550px]"
                                 style={{ border: `1.5px solid ${teamColor}55` }}
                             >
-                                {/* ── Card Header with team colour ─── */}
                                 <div
                                     className="relative p-4 flex items-start justify-between"
                                     style={{ backgroundColor: teamColor }}
                                 >
-                                    {/* Team info */}
                                     <div className="flex-1 min-w-0 pr-2">
                                         <h2
                                             className="text-lg font-black tracking-widest uppercase leading-tight truncate"
@@ -662,7 +626,6 @@ export default function ViewAllTeams() {
                                         </p>
                                     </div>
 
-                                    {/* Team logo — top right */}
                                     <div
                                         className="shrink-0 rounded-xl flex items-center justify-center overflow-hidden"
                                         style={{ backgroundColor: isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)" }}
@@ -681,11 +644,10 @@ export default function ViewAllTeams() {
                                     </div>
                                 </div>
 
-                                {/* ── Budget strip ──────────────────── */}
                                 <div className="flex border-b">
-                                    <div className="flex-1 p-2 text-center border-r border-[#2a2a3d]">
+                                    <div className="flex-1 p-2 text-center border-r border-[#212130]">
                                         <p className="text-[14px] text-[#4a4a66] uppercase font-black tracking-tighter">Spent</p>
-                                        <p className="text-sm font-bold">{formatAmount(spent)}</p>
+                                        <p className="text-sm font-bold text-slate-800">{formatAmount(spent)}</p>
                                     </div>
                                     <div className="flex-1 p-2 text-center">
                                         <p className="text-[14px] text-[#4a4a66] uppercase font-black tracking-tighter">Remaining</p>
@@ -695,10 +657,9 @@ export default function ViewAllTeams() {
                                     </div>
                                 </div>
 
-                                {/* ── Player roster ─────────────────── */}
-                                <div className="flex-1 overflow-y-auto custom-scrollbar-thin p-2 space-y-1">
+                                <div className="flex-1 overflow-y-auto custom-scrollbar-thin p-2 space-y-1 bg-[#f8fafc]">
                                     {players.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center h-full py-8 text-[#3a3a58]">
+                                        <div className="flex flex-col items-center justify-center h-full py-8 text-slate-400">
                                             <Users className="mb-2 opacity-30" size={32} />
                                             <span className="text-xs font-bold uppercase tracking-widest">No players yet</span>
                                         </div>
@@ -709,22 +670,22 @@ export default function ViewAllTeams() {
                                                 <div
                                                     key={player._id}
                                                     onClick={() => handlePlayerClick(player, stats)}
-                                                    className="flex justify-between items-center px-3 py-2 rounded-lg border border-white/5 hover:border-white/10 transition-all cursor-pointer hover:bg-white/5"
-                                                    style={{ backgroundColor: `${teamColor}12` }}
+                                                    className="flex justify-between items-center px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 transition-all cursor-pointer hover:bg-slate-50"
+                                                    style={{ backgroundColor: `${teamColor}08` }}
                                                 >
                                                     <div className="flex items-center gap-2 overflow-hidden">
-                                                        <span className="text-[9px] text-[#4a4a66] w-4 font-bold shrink-0">{idx + 1}.</span>
-                                                        <span className="text-xs text-gray-200 font-medium truncate uppercase tracking-tight">
+                                                        <span className="text-[9px] text-slate-400 w-4 font-bold shrink-0">{idx + 1}.</span>
+                                                        <span className="text-xs text-slate-700 font-bold truncate uppercase tracking-tight">
                                                             {player.name}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="opacity-20">{getRoleIcon(player.role)}</div>
+                                                        <div className="opacity-30">{getRoleIcon(player.role)}</div>
                                                         <span
                                                             className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
                                                             style={{
                                                                 color: teamColor === "#000000" ? "#f0c040" : teamColor,
-                                                                backgroundColor: `${teamColor === "#000000" ? "#f0c040" : teamColor}18`,
+                                                                backgroundColor: `${teamColor === "#000000" ? "#f0c040" : teamColor}12`,
                                                             }}
                                                         >
                                                             {player.finalAmount ? formatAmount(player.finalAmount) : `₹${player.basePrice} L`}
@@ -734,18 +695,6 @@ export default function ViewAllTeams() {
                                             );
                                         })
                                     )}
-                                </div>
-
-                                {/* ── Card footer ───────────────────── */}
-                                <div
-                                    className="p-2 border-t flex justify-center items-center"
-                                    style={{ borderColor: `${teamColor}44`, backgroundColor: `${teamColor}18` }}
-                                >
-                                    <div className="flex gap-1.5">
-                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}99` }} />
-                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}55` }} />
-                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}99` }} />
-                                    </div>
                                 </div>
                             </section>
                         )
@@ -801,7 +750,6 @@ export default function ViewAllTeams() {
                             </div>
                         </div>
 
-                        {/* Player Statistics from playerStats */}
                         <div className="space-y-3">
                             <span className="block text-[10px] font-black uppercase text-slate-400 tracking-widest font-mono">Season Stats</span>
                             <div className="grid grid-cols-3 gap-3">
@@ -816,18 +764,6 @@ export default function ViewAllTeams() {
                                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
                                     <span className="block text-[8px] font-black uppercase text-slate-400 mb-1">Wickets</span>
                                     <p className="text-xl font-black text-slate-900">{selectedStats?.bowling?.total_wickets ?? 0}</p>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span className="block text-[8px] font-black uppercase text-slate-400 mb-1">SR</span>
-                                    <p className="text-xl font-black text-slate-900">{selectedStats?.batting?.strike_rate ?? 0}</p>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span className="block text-[8px] font-black uppercase text-slate-400 mb-1">Economy</span>
-                                    <p className="text-xl font-black text-slate-900">{selectedStats?.bowling?.economy ?? 0}</p>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span className="block text-[8px] font-black uppercase text-slate-400 mb-1">Catches</span>
-                                    <p className="text-xl font-black text-slate-900">{selectedStats?.fielding?.total_catches ?? 0}</p>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { getLogs, login } from "../api/action"
+import { getLogs, getSingleTeam, login } from "../api/action"
 import { getPlayers, getSinglePlayerStats, getTeams } from "../api/action"
 import { TeamsResponse } from "../types/types"
 
@@ -40,3 +40,12 @@ export const useLogin = () => {
         mutationFn: (credentials: { email: string; password: string }) => login(credentials),
     });
 };
+
+export const useGetSingleTeam = (id: string) => {
+    return useQuery({
+        queryKey: ["single-team", id],
+        queryFn: () => getSingleTeam(id),
+        enabled: !!id,
+        refetchIntervalInBackground: true
+    })
+}
