@@ -1,13 +1,13 @@
 import axios from "axios";
 import { Log, LogResponse, PlayersResponse } from "../types/types";
 
-const BASE_URL = "https://mikki-noncredent-darius.ngrok-free.dev/api"
-
+//const BASE_URL = "https://mikki-noncredent-darius.ngrok-free.dev/api"
+const BASE_URL = "https://zpl-4h67.onrender.com/api"
 export const api = axios.create({
     baseURL: BASE_URL,
-    headers: {
-        "ngrok-skip-browser-warning": "true",
-    },
+    // headers: {
+    //     "ngrok-skip-browser-warning": "true",
+    // },
 });
 
 export const getPlayers = async (): Promise<PlayersResponse> => {
@@ -51,5 +51,18 @@ export const getTeams = async () => {
     } catch (error) {
         console.error("Error fetching teams:", error);
         throw new Error("Failed to get Teams")
+    }
+}
+
+export const login = async ({ email, password }: { email: string, password: string }) => {
+    try {
+        const response = await api.post("/auth/login", {
+            email, password
+        })
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error logging in:", error);
+        throw new Error("Failed to log in")
     }
 }
