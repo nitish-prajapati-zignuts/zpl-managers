@@ -490,6 +490,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCircle, DollarSign, Clock, Award } from "lucide-react"
 import {
@@ -534,9 +535,6 @@ const KeepIcon = () => (
     </svg>
 )
 
-// Map team index to a color for the border/badge
-const TEAM_COLORS = ["blue", "yellow", "red", "purple", "red", "orange", "pink", "slate"]
-
 // Map player role string from API to display icon
 const getRoleIcon = (role: string) => {
     switch (role?.toLowerCase()) {
@@ -565,17 +563,29 @@ const formatAmount = (amount: number): string => {
     return `${(amount / 1000).toFixed(0)}K`
 }
 
-const getColorClasses = (color: string) => {
-    switch (color) {
-        case "blue": return { bg: "bg-blue-100", text: "text-blue-600", border: "border-t-blue-600" }
-        case "yellow": return { bg: "bg-yellow-100", text: "text-yellow-600", border: "border-t-yellow-600" }
-        case "red": return { bg: "bg-red-100", text: "text-red-600", border: "border-t-red-600" }
-        case "purple": return { bg: "bg-purple-100", text: "text-purple-600", border: "border-t-purple-600" }
-        case "pink": return { bg: "bg-pink-100", text: "text-pink-600", border: "border-t-pink-600" }
-        case "orange": return { bg: "bg-orange-100", text: "text-orange-600", border: "border-t-orange-600" }
-        default: return { bg: "bg-slate-100", text: "text-slate-600", border: "border-t-slate-600" }
-    }
-}
+// Check if a color is light or dark for text contrast
+const isLightColor = (color: string) => {
+    const hex = color.replace('#', '');
+    if (hex.length !== 6) return false;
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 155;
+};
+
+const TEAM_CONFIG: any = {
+    "THE MAVERICKS": { color: "#372267", logo: "/assets/teams/theMavericks.png", bg: "#3722671A", badgeColor: "#372267" },
+    "THE MAVERICS": { color: "#372267", logo: "/assets/teams/theMavericks.png", bg: "#3722671A", badgeColor: "#372267" },
+    "MARVEL MONSTER": { color: "#0F245C", logo: "/assets/teams/marvelMonster.png", bg: "#0F245C1A", badgeColor: "#0F245C" },
+    "MARVEL MONSTERS": { color: "#0F245C", logo: "/assets/teams/marvelMonster.png", bg: "#0F245C1A", badgeColor: "#0F245C" },
+    "GRAY MIGHTY": { color: "#9899AE", logo: "/assets/teams/grayMighty.png", bg: "#9899AE1A", badgeColor: "#9899AE" },
+    "TROJAN HORSE": { color: "#D9ADE3", logo: "/assets/teams/trojanHorsh.png", bg: "#D9ADE31A", badgeColor: "#D9ADE3" },
+    "STAR STRIKERS": { color: "#C63674", logo: "/assets/teams/starStriker.png", bg: "#C636741A", badgeColor: "#C63674" },
+    "RED SQUAD": { color: "#640105", logo: "/assets/teams/redSquad.png", bg: "#6401051A", badgeColor: "#640105" },
+    "THE TECH TITANS": { color: "#000000", logo: "/assets/teams/techTitans.png", bg: "#0000001A", badgeColor: "#000000" },
+    "SUPER SMASHERS": { color: "#FFD451", logo: "/assets/teams/superSmash.png", bg: "#FFD4511A", badgeColor: "#000000" },
+};
 
 // Find playerStats for a given player _id within a team
 const findStatsForPlayer = (playerStats: any[], playerId: string) => {
@@ -608,119 +618,136 @@ export default function ViewAllTeams() {
                 </div>
             ) : (
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                    {teams.map((team: any, teamIdx: number) => {
-                        const color = TEAM_COLORS[teamIdx % TEAM_COLORS.length]
-                        const colors = getColorClasses(color)
+                    {teams.map((team: any) => {
+                        const teamNameKey = team.name?.toUpperCase().trim() || ""
+                        const teamConfig = TEAM_CONFIG[teamNameKey] || { color: "#64748b", logo: null, bg: "#f1f5f9" }
                         const spent = (team.totalBudget ?? 0) - (team.budgetRemaining ?? 0)
                         const remaining = team.budgetRemaining ?? 0
                         const players: any[] = team.players ?? []
                         const playerStats: any[] = team.playerStats ?? []
+                        const teamColor = teamConfig.color;
+                        const isLight = isLightColor(teamColor);
+                        const textColor = isLight ? "#000000" : "#ffffff";
 
                         return (
-                            <Card key={team._id} className={`overflow-hidden shadow-md hover:shadow-xl transition-all border-t-8 ${colors.border}`}>
-                                <CardHeader className="bg-white p-5 border-b border-slate-100">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="space-y-1">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${colors.bg} ${colors.text}`}>
-                                                Premier League
-                                            </span>
-                                            <CardTitle className="text-xl font-black tracking-tight uppercase italic text-slate-900 leading-none">
-                                                {team.name}
-                                            </CardTitle>
-                                        </div>
-                                        <div className={`p-2.5 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner`}>
-                                            <Users className={`h-5 w-5 ${colors.text}`} />
-                                        </div>
+                            <section
+                                key={team._id}
+                                className="flex flex-col rounded-xl shadow-2xl overflow-hidden transition-all duration-300 group min-h-[550px]"
+                                style={{ border: `1.5px solid ${teamColor}55` }}
+                            >
+                                {/* ── Card Header with team colour ─── */}
+                                <div
+                                    className="relative p-4 flex items-start justify-between"
+                                    style={{ backgroundColor: teamColor }}
+                                >
+                                    {/* Team info */}
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <h2
+                                            className="text-lg font-black tracking-widest uppercase leading-tight truncate"
+                                            style={{ color: textColor }}
+                                        >
+                                            {team.name}
+                                        </h2>
+                                        <p
+                                            className="text-[12px] font-bold uppercase tracking-widest truncate italic mt-1"
+                                            style={{ color: isLight ? "#0d0d14cc" : "#ffffffaa" }}
+                                        >
+                                            Captain: {team.captainName}
+                                        </p>
+                                        <p
+                                            className="text-[12px] font-medium uppercase tracking-widest truncate mt-0.5"
+                                            style={{ color: isLight ? "#0d0d1499" : "#ffffff66" }}
+                                        >
+                                            Manager: {team.managerName}
+                                        </p>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 shadow-sm">
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <Award className="h-3 w-3 text-amber-500" />
-                                                <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider font-mono">Captain</span>
-                                            </div>
-                                            <p className="text-xs font-black text-slate-900 truncate tracking-tight">{team.captainName}</p>
-                                        </div>
-                                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 shadow-sm">
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <UserCircle className="h-3 w-3 text-blue-500" />
-                                                <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider font-mono">Manager</span>
-                                            </div>
-                                            <p className="text-xs font-bold text-slate-700 truncate tracking-tight">{team.managerName}</p>
-                                        </div>
-                                        <div className="p-2.5 rounded-xl bg-red-50/50 border border-red-100 shadow-sm">
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <DollarSign className="h-3 w-3 text-red-500" />
-                                                <span className="block text-[9px] font-black uppercase text-red-400 tracking-wider font-mono">Spent</span>
-                                            </div>
-                                            <p className="text-sm font-black text-red-700 tracking-tighter italic">₹{formatAmount(spent)}</p>
-                                        </div>
-                                        <div className="p-2.5 rounded-xl bg-green-50/50 border border-green-100 shadow-sm">
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <Clock className="h-3 w-3 text-green-500" />
-                                                <span className="block text-[9px] font-black uppercase text-green-400 tracking-wider font-mono">Balance</span>
-                                            </div>
-                                            <p className="text-sm font-black text-green-700 tracking-tighter italic">₹{formatAmount(remaining)}</p>
-                                        </div>
-                                    </div>
-                                </CardHeader>
 
-                                <CardContent className="p-0">
-                                    <div className="bg-white">
-                                        <div className="px-5 py-3 bg-slate-100/30 flex items-center justify-between border-b border-slate-100">
-                                            <span className="text-xs font-black uppercase text-slate-500 tracking-widest leading-none">
-                                                Squad Roster ({players.length})
-                                            </span>
-                                        </div>
-
-                                        {players.length === 0 ? (
-                                            <div className="px-5 py-6 text-center text-xs text-slate-400 font-bold uppercase tracking-widest">
-                                                No players yet
-                                            </div>
+                                    {/* Team logo — top right */}
+                                    <div
+                                        className="shrink-0 rounded-xl flex items-center justify-center overflow-hidden"
+                                        style={{ backgroundColor: isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)" }}
+                                    >
+                                        {teamConfig.logo ? (
+                                            <Image
+                                                src={teamConfig.logo}
+                                                alt={team.name}
+                                                width={60}
+                                                height={60}
+                                                className="w-full h-full object-contain p-1"
+                                            />
                                         ) : (
-                                            <ul className="grid grid-cols-2 divide-x divide-slate-100">
-                                                <div className="divide-y divide-slate-50">
-                                                    {players.slice(0, 8).map((player: any, index: number) => {
-                                                        const stats = findStatsForPlayer(playerStats, player._id)
-                                                        return (
-                                                            <li
-                                                                key={player._id ?? index}
-                                                                onClick={() => handlePlayerClick(player, stats)}
-                                                                className="px-4 py-3.5 flex items-center justify-between group/player hover:bg-slate-50 cursor-pointer transition-all active:scale-[0.98]"
-                                                            >
-                                                                <span className="text-xs font-bold uppercase tracking-tight text-slate-800 truncate mr-1 group-hover/player:translate-x-1 transition-transform">
-                                                                    {player.name?.split(' ').pop()}
-                                                                </span>
-                                                                <div className="flex gap-1 shrink-0 opacity-40 group-hover/player:opacity-100 transition-all scale-95 group-hover/player:scale-100">
-                                                                    {getRoleIcon(player.role)}
-                                                                </div>
-                                                            </li>
-                                                        )
-                                                    })}
-                                                </div>
-                                                <div className="divide-y divide-slate-50">
-                                                    {players.slice(8).map((player: any, index: number) => {
-                                                        const stats = findStatsForPlayer(playerStats, player._id)
-                                                        return (
-                                                            <li
-                                                                key={player._id ?? index}
-                                                                onClick={() => handlePlayerClick(player, stats)}
-                                                                className="px-4 py-3.5 flex items-center justify-between group/player hover:bg-slate-50 cursor-pointer transition-all active:scale-[0.98]"
-                                                            >
-                                                                <span className="text-xs font-bold uppercase tracking-tight text-slate-800 truncate mr-1 group-hover/player:translate-x-1 transition-transform">
-                                                                    {player.name?.split(' ').pop()}
-                                                                </span>
-                                                                <div className="flex gap-1 shrink-0 opacity-40 group-hover/player:opacity-100 transition-all scale-95 group-hover/player:scale-100">
-                                                                    {getRoleIcon(player.role)}
-                                                                </div>
-                                                            </li>
-                                                        )
-                                                    })}
-                                                </div>
-                                            </ul>
+                                            <Users size={20} className={isLight ? "text-black/40" : "text-white/40"} />
                                         )}
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+
+                                {/* ── Budget strip ──────────────────── */}
+                                <div className="flex border-b">
+                                    <div className="flex-1 p-2 text-center border-r border-[#2a2a3d]">
+                                        <p className="text-[14px] text-[#4a4a66] uppercase font-black tracking-tighter">Spent</p>
+                                        <p className="text-sm font-bold">{formatAmount(spent)}</p>
+                                    </div>
+                                    <div className="flex-1 p-2 text-center">
+                                        <p className="text-[14px] text-[#4a4a66] uppercase font-black tracking-tighter">Remaining</p>
+                                        <p className="text-sm font-bold" style={{ color: teamColor === "#000000" ? "#f0c040" : teamColor }}>
+                                            {formatAmount(remaining)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* ── Player roster ─────────────────── */}
+                                <div className="flex-1 overflow-y-auto custom-scrollbar-thin p-2 space-y-1">
+                                    {players.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full py-8 text-[#3a3a58]">
+                                            <Users className="mb-2 opacity-30" size={32} />
+                                            <span className="text-xs font-bold uppercase tracking-widest">No players yet</span>
+                                        </div>
+                                    ) : (
+                                        players.map((player: any, idx: number) => {
+                                            const stats = findStatsForPlayer(playerStats, player._id);
+                                            return (
+                                                <div
+                                                    key={player._id}
+                                                    onClick={() => handlePlayerClick(player, stats)}
+                                                    className="flex justify-between items-center px-3 py-2 rounded-lg border border-white/5 hover:border-white/10 transition-all cursor-pointer hover:bg-white/5"
+                                                    style={{ backgroundColor: `${teamColor}12` }}
+                                                >
+                                                    <div className="flex items-center gap-2 overflow-hidden">
+                                                        <span className="text-[9px] text-[#4a4a66] w-4 font-bold shrink-0">{idx + 1}.</span>
+                                                        <span className="text-xs text-gray-200 font-medium truncate uppercase tracking-tight">
+                                                            {player.name}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="opacity-20">{getRoleIcon(player.role)}</div>
+                                                        <span
+                                                            className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                                                            style={{
+                                                                color: teamColor === "#000000" ? "#f0c040" : teamColor,
+                                                                backgroundColor: `${teamColor === "#000000" ? "#f0c040" : teamColor}18`,
+                                                            }}
+                                                        >
+                                                            {player.finalAmount ? formatAmount(player.finalAmount) : `₹${player.basePrice} L`}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+
+                                {/* ── Card footer ───────────────────── */}
+                                <div
+                                    className="p-2 border-t flex justify-center items-center"
+                                    style={{ borderColor: `${teamColor}44`, backgroundColor: `${teamColor}18` }}
+                                >
+                                    <div className="flex gap-1.5">
+                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}99` }} />
+                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}55` }} />
+                                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${teamColor}99` }} />
+                                    </div>
+                                </div>
+                            </section>
                         )
                     })}
                 </div>
