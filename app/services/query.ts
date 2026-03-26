@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getLogs, getPlayers } from "../api/action"
+import { getLogs } from "../api/action"
 import { getPlayers, getSinglePlayerStats, getTeams } from "../api/action"
 import { TeamsResponse } from "../types/types"
 
