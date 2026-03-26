@@ -89,12 +89,21 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/view-all-teams">
-              <Button variant="outline" size="sm" className="font-bold uppercase tracking-tight text-[11px] h-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-50">
-                View All Teams
-              </Button>
-            </Link>
-          </div>
+            <Button
+                onClick={() => setIsMyTeamOpen(true)}
+                variant="outline"
+                size="sm"
+                className="font-bold uppercase tracking-tight text-[11px] h-8 border-2 border-primary text-primary hover:bg-primary/5 transition-all active:scale-95"
+            >
+              View My Team
+            </Button>
+
+            <Link href="/view-all-teams">
+              <Button variant="outline" size="sm" className="font-bold uppercase tracking-tight text-[11px] h-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-50">
+                View All Teams
+              </Button>
+            </Link>
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}
