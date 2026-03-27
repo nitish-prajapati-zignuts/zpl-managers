@@ -115,6 +115,7 @@ export default function DashboardLayout({
         </div>
       </SidebarInset>
 
+      {/* dialog box for team player detail stats all players show here on click button */}
       <Dialog open={isMyTeamOpen} onOpenChange={setIsMyTeamOpen}>
         <DialogContent className="sm:max-w-2xl border-none shadow-2xl overflow-hidden rounded-[2rem] p-0 gap-0">
           <div className="p-8 text-white relative flex flex-col items-center" style={{ backgroundColor: teamColor }}>

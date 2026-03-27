@@ -12,7 +12,8 @@ import {
   ChevronRight,
   ArrowRight,
   Search,
-  LogOut
+  LogOut,
+  KeyRound
 } from "lucide-react"
 import {
   Sidebar,
@@ -45,6 +46,7 @@ import { Button } from "./ui/button"
 import { PlayerDialog } from "./player-dialog"
 import { useAuthStore } from "@/lib/store"
 import { useRouter } from "next/navigation"
+import { ChangePasswordDialog } from "./change-password-dialog"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
@@ -53,6 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [open, setOpen] = React.useState(false)
   const [selectedPlayer, setSelectedPlayer] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = React.useState(false)
 
   const players = data?.data || []
 
@@ -243,6 +246,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <LogOut className="h-4 w-4" />
                 <span className="font-semibold">Logout</span>
               </SidebarMenuButton>
+              <SidebarMenuButton
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="w-full justify-start gap-3 mt-1 hover:bg-accent transition-colors"
+              >
+                <KeyRound className="h-4 w-4" />
+                <span className="font-semibold">Change Password</span>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
@@ -252,6 +262,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         open={open}
         onOpenChange={setOpen}
         player={selectedPlayer}
+      />
+      <ChangePasswordDialog
+        open={isChangePasswordOpen}
+        onOpenChange={setIsChangePasswordOpen}
       />
     </>
   )

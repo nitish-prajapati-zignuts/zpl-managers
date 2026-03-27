@@ -76,3 +76,16 @@ export const login = async ({ email, password }: { email: string, password: stri
         throw new Error("Failed to log in")
     }
 }
+
+export const changePassword = async ({ id, originalPassword, newPassword }: { id: string, originalPassword: string, newPassword: string }) => {
+    try {
+        const response = await api.put(`/auth/change-password/${id}`, {
+            originalPassword,
+            newPassword
+        })
+        return response.data;
+    } catch (error: any) {
+        console.error("Error changing password:", error);
+        throw new Error(error.response?.data?.message || "Failed to change password")
+    }
+}
