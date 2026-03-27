@@ -7,6 +7,7 @@ export const useTeamPlayers = () => {
     return useQuery({
         queryKey: ["team-players"],
         queryFn: () => getPlayers(),
+        refetchInterval: 3000,
         refetchIntervalInBackground: true
     })
 }
@@ -16,6 +17,7 @@ export const useTeamPlayerById = (id: string) => {
         queryKey: ["team-player", id],
         queryFn: () => getSinglePlayerStats(id),
         enabled: !!id,
+        refetchInterval: 3000,
         refetchIntervalInBackground: true
     })
 }
@@ -24,6 +26,7 @@ export const useTeams = () => {
     return useQuery<TeamsResponse>({
         queryKey: ["teams"],
         queryFn: () => getTeams(),
+        refetchInterval: 3000,
         refetchIntervalInBackground: true
     })
 }
@@ -31,7 +34,9 @@ export const useTeams = () => {
 export const useLogs = () => useQuery({
     queryKey: ["logs"],
     queryFn: getLogs,
-    refetchInterval: 2000,
+    refetchInterval: 3000,
+    refetchIntervalInBackground: true
+
 });
 
 export const useLogin = () => {
@@ -46,6 +51,7 @@ export const useGetSingleTeam = (id: string) => {
         queryKey: ["single-team", id],
         queryFn: () => getSingleTeam(id),
         enabled: !!id,
+        refetchInterval: 3000,
         refetchIntervalInBackground: true
     })
 }
