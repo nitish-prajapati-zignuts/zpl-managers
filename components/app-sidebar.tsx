@@ -11,7 +11,8 @@ import {
   Clock,
   ChevronRight,
   ArrowRight,
-  Search
+  Search,
+  LogOut
 } from "lucide-react"
 import {
   Sidebar,
@@ -24,6 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuBadge,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
 import {
   Collapsible,
@@ -41,9 +43,13 @@ import {
 import { useTeamPlayers, useTeamPlayerById } from "@/app/services/query"
 import { Button } from "./ui/button"
 import { PlayerDialog } from "./player-dialog"
+import { useAuthStore } from "@/lib/store"
+import { useRouter } from "next/navigation"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
+  const router = useRouter()
+  const { user, logout } = useAuthStore()
   const [open, setOpen] = React.useState(false)
   const [selectedPlayer, setSelectedPlayer] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -101,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {pendingPlayers.map((player) => (
-                    <SidebarMenuItem className="flex flex-row items-center pr-2" key={player._id}>
+                    <SidebarMenuItem className="flex flex-row items-center pr-2" key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton className="flex-1">
                         <User className="h-4 w-4 opacity-70" />
                         <span className="truncate">{player.name}</span>
@@ -134,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {soldPlayers.map((player) => (
-                    <SidebarMenuItem key={player._id}>
+                    <SidebarMenuItem key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4 text-blue-500" />
                         <div className="flex flex-col overflow-hidden text-left">
@@ -166,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {unsoldPlayers.map((player) => (
-                    <SidebarMenuItem key={player._id}>
+                    <SidebarMenuItem key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton className="opacity-60" onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4" />
                         <span className="truncate">{player.name}</span>
@@ -215,6 +221,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           {renderContent()}
         </SidebarContent>
+
+        <SidebarFooter className="border-t p-4">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="flex items-center gap-3 px-3 py-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                  {user?.teamName?.charAt(0) || "U"}
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate text-[16px] text-muted-foreground uppercase">{user?.teamName || "No Team"}</span>
+                </div>
+              </div>
+              <SidebarMenuButton
+                onClick={() => {
+                  logout()
+                  router.push("/")
+                }}
+                className="w-full justify-start gap-3 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors mt-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="font-semibold">Logout</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
 
       <PlayerDialog

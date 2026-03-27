@@ -49,9 +49,7 @@ export default function DashboardLayout({
     }
   }, [teamData, setTeamData])
 
-  if (isHydrated && (!token || !user)) {
-    redirect("/")
-  }
+  // Auth check is now handled globally by AuthCheck in the root layout
 
   // Pre-sort players by price descending
   const sortedPlayers = useMemo(() => {
