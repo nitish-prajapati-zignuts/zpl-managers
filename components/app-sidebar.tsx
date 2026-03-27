@@ -10,7 +10,8 @@ import {
   UserX,
   Clock,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Search
 } from "lucide-react"
 import {
   Sidebar,
@@ -45,12 +46,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
   const [open, setOpen] = React.useState(false)
   const [selectedPlayer, setSelectedPlayer] = React.useState<any>(null)
+  const [searchQuery, setSearchQuery] = React.useState("")
 
   const players = data?.data || []
 
-  const pendingPlayers = players.filter(p => !p.status || p.status?.toLowerCase() !== "sold")
-  const unsoldPlayers = players.filter(p => p.status?.toLowerCase() === "unsold")
-  const soldPlayers = players.filter(p => p.status?.toLowerCase() === "sold")
+  const filteredPlayers = React.useMemo(() => {
+    return players.filter((p: any) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [players, searchQuery])
+
+  const pendingPlayers = filteredPlayers.filter(p => !p.status || p.status?.toLowerCase() !== "sold")
+  const unsoldPlayers = filteredPlayers.filter(p => p.status?.toLowerCase() === "unsold")
+  const soldPlayers = filteredPlayers.filter(p => p.status?.toLowerCase() === "sold")
 
   const handleOpenDialog = (player: any) => {
     setSelectedPlayer(player)
@@ -193,6 +201,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
 
         <SidebarContent className="p-2 space-y-1">
+          <div className="px-3 py-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Find player..."
+                className="w-full bg-slate-100 border-none rounded-md py-2 pl-8 pr-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
           {renderContent()}
         </SidebarContent>
       </Sidebar>
