@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { getLogs, getSingleTeam, login } from "../api/action"
+import { changePassword, getLogs, getSingleTeam, login } from "../api/action"
 import { getPlayers, getSinglePlayerStats, getTeams } from "../api/action"
 import { TeamsResponse } from "../types/types"
 
@@ -55,3 +55,10 @@ export const useGetSingleTeam = (id: string) => {
         refetchIntervalInBackground: true
     })
 }
+
+export const useChangePassword = () => {
+    return useMutation({
+        mutationKey: ['change-password'],
+        mutationFn: (data: { id: string; originalPassword: string; newPassword: string }) => changePassword(data),
+    });
+};

@@ -589,7 +589,11 @@ export default function ViewAllTeams() {
                         const teamConfig = TEAM_CONFIG[teamNameKey] || { color: "#64748b", logo: null, bg: "#f1f5f9" }
                         const spent = (team.totalBudget ?? 0) - (team.budgetRemaining ?? 0)
                         const remaining = team.budgetRemaining ?? 0
-                        const players: any[] = team.players ?? []
+                        const players: any[] = [...(team.players ?? [])].sort((a, b) => {
+                            const amountA = a.finalAmount || a.basePrice || 0;
+                            const amountB = b.finalAmount || b.basePrice || 0;
+                            return amountB - amountA;
+                        });
                         const playerStats: any[] = team.playerStats ?? []
                         const teamColor = teamConfig.color;
                         const isLight = isLightColor(teamColor);
