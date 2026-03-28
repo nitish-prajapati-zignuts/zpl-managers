@@ -15,7 +15,7 @@ export default function DashboardPage() {
         totalBudget: teamData?.data?.totalBudget || 0,
         remainingBudget: teamData?.data?.budgetRemaining || 0,
         totalPlayers: teamData?.data?.players?.length || 0,
-        maxSquadSize: 12,
+        maxSquadSize: 15,
     }
 
     const budgetPercent = stats.totalBudget > 0
