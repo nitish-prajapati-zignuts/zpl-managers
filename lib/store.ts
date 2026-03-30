@@ -43,3 +43,13 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+interface TeamState {
+  teamData: any;
+  setTeamData: (data: any) => void;
+}
+
+export const useTeamStore = create<TeamState>((set) => ({
+  teamData: null,
+  setTeamData: (data) => set({ teamData: data }),
+}));

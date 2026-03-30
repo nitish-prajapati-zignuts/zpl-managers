@@ -10,7 +10,10 @@ import {
   UserX,
   Clock,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Search,
+  LogOut,
+  KeyRound
 } from "lucide-react"
 import {
   Sidebar,
@@ -23,6 +26,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuBadge,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
 import {
   Collapsible,
@@ -40,17 +44,30 @@ import {
 import { useTeamPlayers, useTeamPlayerById } from "@/app/services/query"
 import { Button } from "./ui/button"
 import { PlayerDialog } from "./player-dialog"
+import { useAuthStore } from "@/lib/store"
+import { useRouter } from "next/navigation"
+import { ChangePasswordDialog } from "./change-password-dialog"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, isLoading, error } = useTeamPlayers()
+  const router = useRouter()
+  const { user, logout } = useAuthStore()
   const [open, setOpen] = React.useState(false)
   const [selectedPlayer, setSelectedPlayer] = React.useState<any>(null)
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = React.useState(false)
 
   const players = data?.data || []
 
-  const pendingPlayers = players.filter(p => !p.status || p.status?.toLowerCase() !== "sold")
-  const unsoldPlayers = players.filter(p => p.status?.toLowerCase() === "unsold")
-  const soldPlayers = players.filter(p => p.status?.toLowerCase() === "sold")
+  const filteredPlayers = React.useMemo(() => {
+    return players.filter((p: any) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [players, searchQuery])
+
+  const pendingPlayers = filteredPlayers.filter(p => !p.status || p.status?.toLowerCase() !== "sold")
+  const unsoldPlayers = filteredPlayers.filter(p => p.status?.toLowerCase() === "unsold")
+  const soldPlayers = filteredPlayers.filter(p => p.status?.toLowerCase() === "sold")
 
   const handleOpenDialog = (player: any) => {
     setSelectedPlayer(player)
@@ -93,7 +110,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {pendingPlayers.map((player) => (
-                    <SidebarMenuItem className="flex flex-row items-center pr-2" key={player._id}>
+                    <SidebarMenuItem className="flex flex-row items-center pr-2" key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton className="flex-1">
                         <User className="h-4 w-4 opacity-70" />
                         <span className="truncate">{player.name}</span>
@@ -126,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {soldPlayers.map((player) => (
-                    <SidebarMenuItem key={player._id}>
+                    <SidebarMenuItem key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4 text-blue-500" />
                         <div className="flex flex-col overflow-hidden text-left">
@@ -158,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {unsoldPlayers.map((player) => (
-                    <SidebarMenuItem key={player._id}>
+                    <SidebarMenuItem key={player._id} onClick={() => handleOpenDialog(player)}>
                       <SidebarMenuButton className="opacity-60" onClick={() => handleOpenDialog(player)}>
                         <User className="h-4 w-4" />
                         <span className="truncate">{player.name}</span>
@@ -193,14 +210,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
 
         <SidebarContent className="p-2 space-y-1">
+          <div className="px-3 py-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Find player..."
+                className="w-full bg-slate-100 border-none rounded-md py-2 pl-8 pr-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
           {renderContent()}
         </SidebarContent>
+
+        <SidebarFooter className="border-t p-4">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="flex items-center gap-3 px-3 py-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                  {user?.teamName?.charAt(0) || "U"}
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate text-[16px] text-muted-foreground uppercase">{user?.teamName || "No Team"}</span>
+                </div>
+              </div>
+              <SidebarMenuButton
+                onClick={() => {
+                  logout()
+                  router.push("/")
+                }}
+                className="w-full justify-start gap-3 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors mt-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="font-semibold">Logout</span>
+              </SidebarMenuButton>
+              <SidebarMenuButton
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="w-full justify-start gap-3 mt-1 hover:bg-accent transition-colors"
+              >
+                <KeyRound className="h-4 w-4" />
+                <span className="font-semibold">Change Password</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
 
       <PlayerDialog
         open={open}
         onOpenChange={setOpen}
         player={selectedPlayer}
+      />
+      <ChangePasswordDialog
+        open={isChangePasswordOpen}
+        onOpenChange={setIsChangePasswordOpen}
       />
     </>
   )
