@@ -162,61 +162,37 @@ export type PlayerStats = {
     updatedAt: string;
 };
 
-// export type BattingStats = {
-//     innings: number;
-//     total_runs: number;
-//     highest_run: number;
-//     average: number | string; // "-" case
-//     not_out: number;
-//     strike_rate: number;
-//     ball_faced: number;
-//     batting_hand: string;
-//     "4s": number;
-//     "6s": number;
-//     "50s": number;
-//     "100s": number;
-//     boundary_runs: number;
-//     boundary_percentage: number;
-//     runs_per_match: number;
-//     is_centurion: boolean;
-//     is_half_centurion: boolean;
-//     is_aggressive: boolean;
-//     is_consistent: boolean;
-//     is_anchor: boolean;
-// };
 
-// export type BowlingStats = {
-//     innings: number;
-//     total_wickets: number;
-//     balls: number;
-//     highest_wicket: number;
-//     economy: number;
-//     maidens: number;
-//     avg: number;
-//     runs: number;
-//     bowling_style: string;
-//     overs: number;
-//     dot_balls: number;
-//     strike_rate: number;
-//     dot_ball_percentage: number;
-//     wickets_per_match: number;
-//     is_five_wicket_haul: boolean;
-//     is_economical: boolean;
-//     is_wicket_taker: boolean;
-//     is_spinner: boolean;
-// };
+export interface PlayerDetails {
+    name?: string
+    status?: "sold" | "unsold" | "on_block" | "pending"
+    photoUrl?: string
+    role?: string
+    grade?: string
+    soldTo?: string
+    finalAmount?: number
+}
 
-// export type FieldingStats = {
-//     catches: number;
-//     caught_behind: number;
-//     run_outs: number;
-//     assist_run_outs: number;
-//     stumpings: number;
-//     caught_and_bowl: number;
-//     total_catches: number;
-//     total_dismissal: number;
-//     dismissals_per_match: number;
-//     is_keeper: boolean;
-//     is_safe_hands: boolean;
-//     is_sharp_fielder: boolean;
-// };
+export interface AuctionLog {
+    createdAt: string
+    action?: string
+    basePrice?: number
+    amount?: number
+    teamName?: string
+    playerDetails?: PlayerDetails
+    statsDetails?: StatsDetails
+}
+
+export interface DashboardStats {
+    totalBudget: number
+    remainingBudget: number
+    totalPlayers: number
+    maxSquadSize: number
+}
+
+export interface TeamConfig {
+    color: string
+    logo: string | null
+    bg: string
+    badgeColor: string
+}
