@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 import { QueryProvider } from "@/components/query-provider";
+import { AuthCheck } from "@/components/auth-check";
 
 export default function RootLayout({
   children,
@@ -36,7 +37,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <QueryProvider>
           <TooltipProvider>
-            {children}
+            <AuthCheck>
+              {children}
+            </AuthCheck>
           </TooltipProvider>
         </QueryProvider>
       </body>
